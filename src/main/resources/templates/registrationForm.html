@@ -1,0 +1,79 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>registreering</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"/>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+    <link rel="stylesheet" type="text/css"  th:href="@{/css/main.css}"/>
+</head>
+<body>
+    <div th:replace="fragments/header :: header">
+    </div>
+
+    <div>
+        <p th:if="${nameError}" class="error">sellist nime pole</p>
+        <p th:if="${dateError}" class="error">see aeg on võetud</p>
+        <form action="#" th:action="@{/}" th:object="${dentistVisitDTO}" method="post" autocomplete="off" >
+            <table class="table">
+                <tr>
+                    <td><p th:text="#{dentist.name}">dentist.name</p></td>
+                    <td>
+                        <select th:field="*{dentistName}" id="names">
+                            <option th:each="dentist : ${dentists}"
+                                    th:value="${dentist.dentistName}"
+                                    th:text="${dentist.dentistName}"></option>
+                        </select>
+
+                    </td>
+                    <td th:if="${#fields.hasErrors('dentistName')}" th:errors="*{dentistName}">name.error</td>
+                </tr>
+                <tr>
+                    <td><p th:text="#{visit.date}">visit.date</p></td>
+                    <td><input type="text" th:field="*{visitTime}" id="datepicker"/></td>
+                    <td th:if="${#fields.hasErrors('visitTime')}" th:errors="*{visitTime}">date.error</td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit" th:text="#{register.visit}"></button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var dentists = /*[[${dentists}]]*/ 'default';
+        function containsDate(dentist,calenderDate) {
+            let val = document.getElementById('names').value;
+            if (dentist.dentistName === val) {
+                for (const y in dentist.dates) {
+                    const date = new Date(dentist.dates[y]);
+                    if (!(date < calenderDate) && !(date > calenderDate)){ //miks javascript?????????
+                        console.log(2);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        function unavailable(calenderDate) {
+            for(const x in dentists){
+                if (containsDate(dentists[x],calenderDate)) {
+                    return [false, "", "Unavailable"];
+                }
+            }
+            return [true, ""];
+        }
+
+        $( function() {
+            $( "#datepicker" ).datepicker(
+                {   dateFormat: 'dd.mm.yy',
+                    minDate:-1,
+                    beforeShowDay: unavailable
+                }
+            );
+        } );
+        /*]]>*/
+    </script>
+</body>
+</html>

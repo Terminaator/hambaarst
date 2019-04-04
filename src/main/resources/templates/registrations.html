@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>registreeringud</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+</head>
+<body>
+    <div th:replace="fragments/header :: header">
+    </div>
+    <div>
+        <div>
+            <p th:if="${error}" class="error">midagi läks valesti</p>
+        </div>
+        <table id="table" class="table">
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>kuupäev</th>
+                <th>hambaarst</th>
+                <th><div>
+                    <!-- https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_filter_table -->
+                    <input type="text" id="myInput" onkeyup="searchByName()" placeholder="otsi nimega" title="Type in a name"/>
+                </div></th>
+            </tr>
+            </thead>
+            <tbody>
+                <th:block th:each="registration : ${registrations}">
+                    <tr class="newRow" th:id="${registration.id}">
+                        <td th:text="${registration.id}" th:id="${registration.id}+id"></td>
+                        <td th:text="${registration.date}" th:id="${registration.id}+date"></td>
+                        <td th:text="${registration.dentist.dentistName}" th:id="${registration.id}+name"></td>
+                        <td>
+                            <form th:action="@{/remove}" method="post" th:object="${dentistVisitRemoveDTO}">
+                                <input  type="hidden" th:attr="name='id'" th:value="${registration.id}"/>
+                                <button type="submit" th:text="#{registrationPage.remove}"></button>
+                            </form>
+                        </td>
+                    </tr>
+                </th:block>
+                <tr>
+                    <form th:action="@{/update}" method="post" th:object="${dentistVisitUpdateDTO}">
+                        <td>
+                            <input  readonly="readonly" placeholder="id" th:field="*{id}" id="dentistId" type="text" />
+                        </td>
+                        <td>
+                            <input placeholder="kuupäev" th:field="*{date}" id="date" type="text"/>
+                        </td>
+                        <td>
+                            <select id="name" th:field="*{dentist}">
+                                <option th:action="@{/registrations}" th:each="dentist : ${dentists}"
+                                        th:value="${dentist.dentistName}"
+                                        th:text="${dentist.dentistName}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit" th:text="#{registrationPage.update}"></button>
+                        </td>
+                    </form>
+                </tr>
+             </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
